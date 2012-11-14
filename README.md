@@ -1,3 +1,19 @@
+Plase I need to do a REQUEST (the github pull request of pyodconverter is closed!) 
+
+BUG REPORT: when requesting TXT generation.
+Running LibreOffice from the command line on UBUNTU,
+
+  $ soffice --headless --convert-to txt:Text test.htm
+
+I have a test.txt good generation. BUT with, 
+
+  $ python DocumentConverter.py test.htm test.txt
+
+I have an "unsupported conversion" error.
+
+
+
+
 PyODConverter
 =============
 
