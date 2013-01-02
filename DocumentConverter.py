@@ -11,8 +11,12 @@
 DEFAULT_OPENOFFICE_PORT = 2002
 
 import uno
+
 from os.path import abspath, isfile, splitext
+from com.sun.star.awt import Size
 from com.sun.star.beans import PropertyValue
+from com.sun.star.view.PaperFormat import USER
+from com.sun.star.view.PaperOrientation import PORTRAIT, LANDSCAPE
 from com.sun.star.task import ErrorCodeIOException
 from com.sun.star.connection import NoConnectException
 
@@ -26,8 +30,20 @@ FAMILY_DRAWING = "Drawing"
 # Configuration Start #
 #---------------------#
 
-# see http://wiki.services.openoffice.org/wiki/Framework/Article/Filter
+# see http://www.openoffice.org/api/docs/common/ref/com/sun/star/view/PaperFormat.html
+PAPER_SIZE_MAP = {
+    "A5": Size(14800,21000),
+    "A4": Size(21000,29700),
+    "A3": Size(29700,42000)
+}
 
+# see http://www.openoffice.org/api/docs/common/ref/com/sun/star/view/PaperOrientation.html
+PAPER_ORIENTATION_MAP = {
+    "PORTRAIT": PORTRAIT,
+    "LANDSCAPE": LANDSCAPE
+}
+
+# see http://wiki.services.openoffice.org/wiki/Framework/Article/Filter
 # most formats are auto-detected; only those requiring options are defined here
 IMPORT_FILTER_MAP = {
     "txt": {
@@ -60,6 +76,9 @@ EXPORT_FILTER_MAP = {
     "doc": {
         FAMILY_TEXT: { "FilterName": "MS Word 97" }
     },
+    "docx": {
+        FAMILY_TEXT: { "FilterName": "MS Word 2007 XML" }
+    },
     "rtf": {
         FAMILY_TEXT: { "FilterName": "Rich Text Format" }
     },
@@ -87,6 +106,9 @@ EXPORT_FILTER_MAP = {
     "ppt": {
         FAMILY_PRESENTATION: { "FilterName": "MS PowerPoint 97" }
     },
+    "pptx": {
+        FAMILY_PRESENTATION: { "FilterName": "Impress MS PowerPoint 2007 XML" }
+    },
     "swf": {
         FAMILY_DRAWING: { "FilterName": "draw_flash_Export" },
         FAMILY_PRESENTATION: { "FilterName": "impress_flash_Export" }
@@ -103,6 +125,9 @@ PAGE_STYLE_OVERRIDE_PROPERTIES = {
         # c) 'Fit print range(s) on number of pages': 'Fit print range(s) on number of pages'
         #"ScaleToPages": 1,
         "PrintGrid": False
+    },
+    FAMILY_PRESENTATION: {
+        "PageScale": 100
     }
 }
 
@@ -130,7 +155,17 @@ class DocumentConverter:
             raise DocumentConversionException, "failed to connect to OpenOffice.org on port %s" % port
         self.desktop = context.ServiceManager.createInstanceWithContext("com.sun.star.frame.Desktop", context)
 
-    def convert(self, inputFile, outputFile):
+    def convert(self, inputFile, outputFile, paperSize, paperOrientation):
+        
+        if PAPER_SIZE_MAP.has_key(paperSize) is False:
+            raise Exception("The paper size given doesn't exist.")
+        else:
+            paperSize = PAPER_SIZE_MAP[paperSize]
+        
+        if PAPER_ORIENTATION_MAP.has_key(paperOrientation) is False:
+            raise Exception("The paper orientation given doesn't exist.")
+        else:
+            paperOrientation = PAPER_ORIENTATION_MAP[paperOrientation]
 
         inputUrl = self._toFileUrl(inputFile)
         outputUrl = self._toFileUrl(outputFile)
@@ -151,7 +186,15 @@ class DocumentConverter:
         
         outputExt = self._getFileExt(outputFile)
         storeProperties = self._getStoreProperties(document, outputExt)
-
+        
+        printConfigs = {
+             'Size': paperSize,
+             'PaperFormat': USER,
+             'PaperOrientation': paperOrientation
+        }
+        
+        document.setPrinter( self._toProperties( printConfigs ) )
+        
         try:
             document.storeToURL(outputUrl, self._toProperties(storeProperties))
         finally:
@@ -159,12 +202,15 @@ class DocumentConverter:
 
     def _overridePageStyleProperties(self, document, family):
         if PAGE_STYLE_OVERRIDE_PROPERTIES.has_key(family):
-            properties = PAGE_STYLE_OVERRIDE_PROPERTIES[family]
-            pageStyles = document.getStyleFamilies().getByName('PageStyles')
-            for styleName in pageStyles.getElementNames():
-                pageStyle = pageStyles.getByName(styleName)
-                for name, value in properties.items():
-                    pageStyle.setPropertyValue(name, value)
+            styleFamilies = document.getStyleFamilies()
+            #self._dump( styleFamilies.getByName('PageStyles') )
+            if styleFamilies.hasByName('PageStyles'):
+                properties = PAGE_STYLE_OVERRIDE_PROPERTIES[family]
+                pageStyles = styleFamilies.getByName('PageStyles')
+                for styleName in pageStyles.getElementNames():
+                    pageStyle = pageStyles.getByName(styleName)
+                    for name, value in properties.items():
+                        pageStyle.setPropertyValue(name, value)
 
     def _getStoreProperties(self, document, outputExt):
         family = self._detectFamily(document)
@@ -208,20 +254,31 @@ class DocumentConverter:
             props.append(prop)
         return tuple(props)
 
+    def _dump(self, obj):
+        for attr in dir(obj):
+            print "obj.%s = %s\n" % (attr, getattr(obj, attr))
 
 if __name__ == "__main__":
-    from sys import argv, exit
     
-    if len(argv) < 3:
-        print "USAGE: python %s <input-file> <output-file>" % argv[0]
-        exit(255)
-    if not isfile(argv[1]):
-        print "no such input file: %s" % argv[1]
+    from sys import exit
+    from optparse import OptionParser
+    
+    parser = OptionParser(usage="usage: python %prog [options] <input-file> <output-file>", version="%prog 1.1")
+    parser.add_option("-s", "--paper-size", default="A4", action="store", type="string", dest="paper_size", help="defines the paper size to converter that can be A3, A4, A5.")
+    parser.add_option("-o", "--paper-orientation", default="PORTRAIT", action="store", type="string", dest="paper_orientation", help="defines the paper orientation to converter that can be PORTRAIT or LANDSCAPE.")
+    
+    (options, args) = parser.parse_args()
+    
+    if len(args) != 2:
+        parser.error("wrong number of arguments")
+    
+    if not isfile(args[0]):
+        print "No such input file: %s" % args[0]
         exit(1)
-
+        
     try:
         converter = DocumentConverter()    
-        converter.convert(argv[1], argv[2])
+        converter.convert(args[0], args[1], options.paper_size, options.paper_orientation)
     except DocumentConversionException, exception:
         print "ERROR! " + str(exception)
         exit(1)
