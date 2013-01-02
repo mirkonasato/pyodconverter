@@ -64,5 +64,5 @@ v1.0.0 - 2008-05-05
 
 ## Contributors ##
 
-* __ mirkonasato__ <mirko.nasato@gmail.com>
+* __mirkonasato__ <mirko.nasato@gmail.com>
 * __marcelaraujo__ <admin@marcelaraujo.me>
