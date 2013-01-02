@@ -263,7 +263,7 @@ if __name__ == "__main__":
     from sys import exit
     from optparse import OptionParser
     
-    parser = OptionParser(usage="usage: python %prog [options] <input-file> <output-file>", version="%prog 1.1")
+    parser = OptionParser(usage="usage: python %prog [options] <input-file> <output-file>", version="%prog 1.3")
     parser.add_option("-s", "--paper-size", default="A4", action="store", type="string", dest="paper_size", help="defines the paper size to converter that can be A3, A4, A5.")
     parser.add_option("-o", "--paper-orientation", default="PORTRAIT", action="store", type="string", dest="paper_orientation", help="defines the paper orientation to converter that can be PORTRAIT or LANDSCAPE.")
     

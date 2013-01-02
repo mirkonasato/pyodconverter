@@ -35,6 +35,12 @@ a Python module, exporting a DocumentConverter class with a very simple API.
 
 ChangeLog
 ---------
+v1.3 - 2013-01-02
+
+* Adding new docx format support.
+* Adding paper size and orientation capable.
+* Updated the options parser.
+* Updated contributors.
 
 v1.2 - 2012-03-10
 
@@ -56,3 +62,7 @@ v1.0.0 - 2008-05-05
   extension. This means all OOo-supported input types should now be accepted
   without any additional configuration.
 
+## Contributors ##
+
+* __ mirkonasato__ <mirko.nasato@gmail.com>
+* __marcelaraujo__ <admin@marcelaraujo.me>
