@@ -1,5 +1,5 @@
 #
-# PyODConverter (Python OpenDocument Converter) v1.2 - 2012-03-10
+# PyODConverter (Python OpenDocument Converter) v1.3 - 2013-01-02
 #
 # This script converts a document from one office format to another by
 # connecting to an OpenOffice.org instance via Python-UNO bridge.
@@ -150,10 +150,10 @@ class DocumentConverter:
         localContext = uno.getComponentContext()
         resolver = localContext.ServiceManager.createInstanceWithContext("com.sun.star.bridge.UnoUrlResolver", localContext)
         try:
-            context = resolver.resolve("uno:socket,host=localhost,port=%s;urp;StarOffice.ComponentContext" % port)
+            self.context = resolver.resolve("uno:socket,host=localhost,port=%s;urp;StarOffice.ComponentContext" % port)
         except NoConnectException:
             raise DocumentConversionException, "failed to connect to OpenOffice.org on port %s" % port
-        self.desktop = context.ServiceManager.createInstanceWithContext("com.sun.star.frame.Desktop", context)
+        self.desktop = self.context.ServiceManager.createInstanceWithContext("com.sun.star.frame.Desktop", self.context)
 
     def convert(self, inputFile, outputFile, paperSize, paperOrientation):
         
@@ -188,9 +188,9 @@ class DocumentConverter:
         storeProperties = self._getStoreProperties(document, outputExt)
         
         printConfigs = {
-             'Size': paperSize,
-             'PaperFormat': USER,
-             'PaperOrientation': paperOrientation
+            'Size': paperSize,
+            'PaperFormat': USER,
+            'PaperOrientation': paperOrientation
         }
         
         document.setPrinter( self._toProperties( printConfigs ) )
@@ -203,7 +203,6 @@ class DocumentConverter:
     def _overridePageStyleProperties(self, document, family):
         if PAGE_STYLE_OVERRIDE_PROPERTIES.has_key(family):
             styleFamilies = document.getStyleFamilies()
-            #self._dump( styleFamilies.getByName('PageStyles') )
             if styleFamilies.hasByName('PageStyles'):
                 properties = PAGE_STYLE_OVERRIDE_PROPERTIES[family]
                 pageStyles = styleFamilies.getByName('PageStyles')
@@ -211,7 +210,14 @@ class DocumentConverter:
                     pageStyle = pageStyles.getByName(styleName)
                     for name, value in properties.items():
                         pageStyle.setPropertyValue(name, value)
-
+            """
+            else:
+                if styleFamilies.hasByName("Default"):
+                    style = self.context.ServiceManager.createInstance("com.sun.star.style.PageStyle")
+                    pageStyles = styleFamilies.getByName("Default")
+                    pageStyles.insertByName("PageStyle", style)
+            """
+        
     def _getStoreProperties(self, document, outputExt):
         family = self._detectFamily(document)
         try:
