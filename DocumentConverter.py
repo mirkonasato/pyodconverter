@@ -301,34 +301,6 @@ class DocumentConverter:
         outputExt = self._getFileExt(outputFile)
         storeProperties = self._getStoreProperties(document, outputExt)
         
-        '''
-        page = document.getDrawPages().getByIndex(2)
-        inst = self.context.ServiceManager.createInstance("com.sun.star.drawing.GraphicExportFilter")
-        inst.setSourceDocument( page )
-        
-        props = {
-            "MediaType": "image/png",
-            "URL": "file:///root/presentations-tips.png"
-        }
-        
-        inst.filter(self._toProperties( props ))
-        exit(0)
-        
-        out_props = [
-            PropertyValue("FilterName" , 0, "teste" , 0),
-            PropertyValue("Overwrite" , 0, True , 0),
-        ]
-        
-        filter_props = PropertyValue(
-            "FilterData", 0, uno.Any("[]com.sun.star.beans.PropertyValue", (
-                        PropertyValue("SelectPdfVersion", 0, 1L, 0),
-                        PropertyValue("UseTaggedPDF", 0, False, 0),
-                )), 0)
-        out_props.append(filter_props)
-        
-        print(out_props)
-        '''
-        
         printConfigs = {
             'Size': paperSize,
             'PaperFormat': USER,
