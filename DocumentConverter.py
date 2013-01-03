@@ -1,10 +1,10 @@
 #
-# PyODConverter (Python OpenDocument Converter) v1.3 - 2013-01-02
+# PyODConverter (Python OpenDocument Converter) v1.4 - 2013-01-02
 #
 # This script converts a document from one office format to another by
 # connecting to an OpenOffice.org instance via Python-UNO bridge.
 #
-# Copyright (C) 2008-2012 Mirko Nasato
+# Copyright (C) 2008-2013 Mirko Nasato
 # Licensed under the GNU LGPL v2.1 - http://www.gnu.org/licenses/lgpl-2.1.html
 # - or any later version.
 #
@@ -30,21 +30,27 @@ FAMILY_DRAWING = "Drawing"
 # Configuration Start #
 #---------------------#
 
-# see http://www.openoffice.org/api/docs/common/ref/com/sun/star/view/PaperFormat.html
+'''
+See http://www.openoffice.org/api/docs/common/ref/com/sun/star/view/PaperFormat.html
+'''
 PAPER_SIZE_MAP = {
     "A5": Size(14800,21000),
     "A4": Size(21000,29700),
     "A3": Size(29700,42000)
 }
 
-# see http://www.openoffice.org/api/docs/common/ref/com/sun/star/view/PaperOrientation.html
+'''
+See http://www.openoffice.org/api/docs/common/ref/com/sun/star/view/PaperOrientation.html
+'''
 PAPER_ORIENTATION_MAP = {
     "PORTRAIT": PORTRAIT,
     "LANDSCAPE": LANDSCAPE
 }
 
-# see http://wiki.services.openoffice.org/wiki/Framework/Article/Filter
-# most formats are auto-detected; only those requiring options are defined here
+'''
+See http://wiki.services.openoffice.org/wiki/Framework/Article/Filter
+most formats are auto-detected; only those requiring options are defined here
+'''
 IMPORT_FILTER_MAP = {
     "txt": {
         "FilterName": "Text (encoded)",
@@ -56,62 +62,173 @@ IMPORT_FILTER_MAP = {
     }
 }
 
+'''
+The filter options to export PDF files can be viewed on URL below
+http://wiki.openoffice.org/wiki/API/Tutorials/PDF_export#General_properties
+'''
 EXPORT_FILTER_MAP = {
     "pdf": {
-        FAMILY_TEXT: { "FilterName": "writer_pdf_Export" },
-        FAMILY_WEB: { "FilterName": "writer_web_pdf_Export" },
-        FAMILY_SPREADSHEET: { "FilterName": "calc_pdf_Export" },
-        FAMILY_PRESENTATION: { "FilterName": "impress_pdf_Export" },
-        FAMILY_DRAWING: { "FilterName": "draw_pdf_Export" }
+        FAMILY_TEXT: {
+            "FilterName": "writer_pdf_Export",
+            "FilterData": {
+                "IsSkipEmptyPages": True
+            },
+            "Overwrite": True
+        },
+        FAMILY_WEB: {
+            "FilterName": "writer_web_pdf_Export",
+            "FilterData": {
+                "IsSkipEmptyPages": True
+            },
+            "Overwrite": True
+        },
+        FAMILY_SPREADSHEET: {
+            "FilterName": "calc_pdf_Export",
+            "FilterData": {
+                "IsSkipEmptyPages": True
+            },
+            "Overwrite": True
+        },
+        FAMILY_PRESENTATION: {
+            "FilterName": "impress_pdf_Export",
+            "FilterData": {
+                "IsSkipEmptyPages": True
+            },
+            "Overwrite": True
+        },
+        FAMILY_DRAWING: {
+            "FilterName": "draw_pdf_Export",
+            "FilterData": {
+                "IsSkipEmptyPages": True
+            },
+            "Overwrite": True
+        }
     },
     "html": {
-        FAMILY_TEXT: { "FilterName": "HTML (StarWriter)" },
-        FAMILY_SPREADSHEET: { "FilterName": "HTML (StarCalc)" },
-        FAMILY_PRESENTATION: { "FilterName": "impress_html_Export" }
+        FAMILY_TEXT: {
+            "FilterName": "HTML (StarWriter)",
+            "Overwrite": True
+        },
+        FAMILY_SPREADSHEET: {
+            "FilterName": "HTML (StarCalc)",
+            "Overwrite": True
+        },
+        FAMILY_PRESENTATION: {
+            "FilterName": "impress_html_Export",
+            "Overwrite": True
+        }
     },
     "odt": {
-        FAMILY_TEXT: { "FilterName": "writer8" },
-        FAMILY_WEB: { "FilterName": "writerweb8_writer" }
+        FAMILY_TEXT: {
+            "FilterName": "writer8",
+            "Overwrite": True
+        },
+        FAMILY_WEB: {
+            "FilterName": "writerweb8_writer",
+            "Overwrite": True
+        }
     },
     "doc": {
-        FAMILY_TEXT: { "FilterName": "MS Word 97" }
+        FAMILY_TEXT: {
+            "FilterName": "MS Word 97",
+            "Overwrite": True
+        }
     },
     "docx": {
-        FAMILY_TEXT: { "FilterName": "MS Word 2007 XML" }
+        FAMILY_TEXT: {
+            "FilterName": "MS Word 2007 XML",
+            "Overwrite": True
+        }
     },
     "rtf": {
-        FAMILY_TEXT: { "FilterName": "Rich Text Format" }
+        FAMILY_TEXT: {
+            "FilterName": "Rich Text Format",
+            "Overwrite": True
+        }
     },
     "txt": {
         FAMILY_TEXT: {
             "FilterName": "Text",
-            "FilterOptions": "utf8"
+            "FilterOptions": "utf8",
+            "Overwrite": True
         }
     },
     "ods": {
-        FAMILY_SPREADSHEET: { "FilterName": "calc8" }
+        FAMILY_SPREADSHEET: {
+            "FilterName": "calc8",
+            "Overwrite": True
+        }
     },
     "xls": {
-        FAMILY_SPREADSHEET: { "FilterName": "MS Excel 97" }
+        FAMILY_SPREADSHEET: {
+            "FilterName": "MS Excel 97",
+            "Overwrite": True
+        }
     },
     "csv": {
         FAMILY_SPREADSHEET: {
             "FilterName": "Text - txt - csv (StarCalc)",
-            "FilterOptions": "44,34,0"
+            "FilterOptions": "44,34,0",
+            "Overwrite": True
         }
     },
     "odp": {
-        FAMILY_PRESENTATION: { "FilterName": "impress8" }
+        FAMILY_PRESENTATION: {
+            "FilterName": "impress8",
+            "Overwrite": True
+        }
     },
     "ppt": {
-        FAMILY_PRESENTATION: { "FilterName": "MS PowerPoint 97" }
+        FAMILY_PRESENTATION: {
+            "FilterName": "MS PowerPoint 97",
+            "Overwrite": True
+        }
     },
     "pptx": {
-        FAMILY_PRESENTATION: { "FilterName": "Impress MS PowerPoint 2007 XML" }
+        FAMILY_PRESENTATION: {
+            "FilterName": "Impress MS PowerPoint 2007 XML",
+            "Overwrite": True
+        }
     },
     "swf": {
-        FAMILY_DRAWING: { "FilterName": "draw_flash_Export" },
-        FAMILY_PRESENTATION: { "FilterName": "impress_flash_Export" }
+        FAMILY_DRAWING: {
+            "FilterName": "draw_flash_Export",
+            "Overwrite": True
+        },
+        FAMILY_PRESENTATION: {
+            "FilterName": "impress_flash_Export",
+            "Overwrite": True
+        }
+    },
+    "png": {
+        FAMILY_PRESENTATION: {
+            "FilterName": "impress_png_Export",
+            "Overwrite": True
+        },
+        FAMILY_DRAWING: {
+            "FilterName": "draw_png_Export",
+            "Overwrite": True
+        }
+    },
+    "gif": {
+        FAMILY_PRESENTATION: {
+            "FilterName": "impress_gif_Export",
+            "Overwrite": True
+        },
+        FAMILY_DRAWING: {
+            "FilterName": "draw_gif_Export",
+            "Overwrite": True
+        }
+    },
+    "jpg": {
+        FAMILY_PRESENTATION: {
+            "FilterName": "impress_jpg_Export",
+            "Overwrite": True
+        },
+        FAMILY_DRAWING: {
+            "FilterName": "draw_jpg_Export",
+            "Overwrite": True
+        }
     }
 }
 
@@ -125,9 +242,6 @@ PAGE_STYLE_OVERRIDE_PROPERTIES = {
         # c) 'Fit print range(s) on number of pages': 'Fit print range(s) on number of pages'
         #"ScaleToPages": 1,
         "PrintGrid": False
-    },
-    FAMILY_PRESENTATION: {
-        "PageScale": 100
     }
 }
 
@@ -187,12 +301,39 @@ class DocumentConverter:
         outputExt = self._getFileExt(outputFile)
         storeProperties = self._getStoreProperties(document, outputExt)
         
+        '''
+        page = document.getDrawPages().getByIndex(2)
+        inst = self.context.ServiceManager.createInstance("com.sun.star.drawing.GraphicExportFilter")
+        inst.setSourceDocument( page )
+        
+        props = {
+            "MediaType": "image/png",
+            "URL": "file:///root/presentations-tips.png"
+        }
+        
+        inst.filter(self._toProperties( props ))
+        exit(0)
+        
+        out_props = [
+            PropertyValue("FilterName" , 0, "teste" , 0),
+            PropertyValue("Overwrite" , 0, True , 0),
+        ]
+        
+        filter_props = PropertyValue(
+            "FilterData", 0, uno.Any("[]com.sun.star.beans.PropertyValue", (
+                        PropertyValue("SelectPdfVersion", 0, 1L, 0),
+                        PropertyValue("UseTaggedPDF", 0, False, 0),
+                )), 0)
+        out_props.append(filter_props)
+        
+        print(out_props)
+        '''
+        
         printConfigs = {
             'Size': paperSize,
             'PaperFormat': USER,
             'PaperOrientation': paperOrientation
         }
-        
         document.setPrinter( self._toProperties( printConfigs ) )
         
         try:
@@ -210,13 +351,6 @@ class DocumentConverter:
                     pageStyle = pageStyles.getByName(styleName)
                     for name, value in properties.items():
                         pageStyle.setPropertyValue(name, value)
-            """
-            else:
-                if styleFamilies.hasByName("Default"):
-                    style = self.context.ServiceManager.createInstance("com.sun.star.style.PageStyle")
-                    pageStyles = styleFamilies.getByName("Default")
-                    pageStyles.insertByName("PageStyle", style)
-            """
         
     def _getStoreProperties(self, document, outputExt):
         family = self._detectFamily(document)
@@ -251,13 +385,14 @@ class DocumentConverter:
     def _toFileUrl(self, path):
         return uno.systemPathToFileUrl(abspath(path))
 
-    def _toProperties(self, dict):
+    def _toProperties(self, options):
         props = []
-        for key in dict:
-            prop = PropertyValue()
-            prop.Name = key
-            prop.Value = dict[key]
-            props.append(prop)
+        for key in options:
+            if isinstance(options[key], dict):
+                property = PropertyValue(key, 0, uno.Any("[]com.sun.star.beans.PropertyValue", (self._toProperties(options[key]))), 0)
+            else:
+                property = PropertyValue(key, 0, options[key], 0)
+            props.append(property)
         return tuple(props)
 
     def _dump(self, obj):
@@ -269,7 +404,7 @@ if __name__ == "__main__":
     from sys import exit
     from optparse import OptionParser
     
-    parser = OptionParser(usage="usage: python %prog [options] <input-file> <output-file>", version="%prog 1.3")
+    parser = OptionParser(usage="usage: python %prog [options] <input-file> <output-file>", version="%prog 1.4")
     parser.add_option("-s", "--paper-size", default="A4", action="store", type="string", dest="paper_size", help="defines the paper size to converter that can be A3, A4, A5.")
     parser.add_option("-o", "--paper-orientation", default="PORTRAIT", action="store", type="string", dest="paper_orientation", help="defines the paper orientation to converter that can be PORTRAIT or LANDSCAPE.")
     
