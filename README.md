@@ -1,4 +1,4 @@
-PyODConverter
+## PyODConverter
 =============
 
 PyODConverter (for Python OpenDocument Converter) is a Python script that
@@ -8,7 +8,7 @@ LibreOffice or OpenOffice.org.
 The script was written as a simpler alternative to
 [JODConverter](http://code.google.com/p/jodconverter/) for command line usage.
 
-Usage
+## Usage
 -----
 
 PyODConverter requires LibreOffice/OpenOffice.org to be running as a service
@@ -30,11 +30,22 @@ or on Linux
 
     $ /opt/openoffice.org3.1/program/python DocumentConverter.py test.odt test.pdf
 
+### Possible options are the following:
+
+* **o** - Set the page orientation `-o LANDSCAPE` or `--page-orientation LANDSCAPE` (defaults to PORTRAIT)
+* **s** - Set the page size `-s A3` or `--page-size A3` (defaults to A4)
+
 If you want to write your own scripts in Python, PyODConverter can also act as
 a Python module, exporting a DocumentConverter class with a very simple API.
 
-ChangeLog
+## ChangeLog
 ---------
+v1.4 - 2013-01-03
+
+* Improvement the toProperties method to be able add array Uno properties
+* Adding the Overwrite and IsSkipEmptyPages options.
+* Update the README.
+
 v1.3 - 2013-01-02
 
 * Adding new docx format support.
