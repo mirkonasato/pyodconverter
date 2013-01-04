@@ -36,7 +36,10 @@ See http://www.openoffice.org/api/docs/common/ref/com/sun/star/view/PaperFormat.
 PAPER_SIZE_MAP = {
     "A5": Size(14800,21000),
     "A4": Size(21000,29700),
-    "A3": Size(29700,42000)
+    "A3": Size(29700,42000),
+    "LETTER": Size(21590,27940),
+    "LEGAL": Size(21590,35560),
+    "TABLOID": Size(27900,43200),
 }
 
 '''
