@@ -39,7 +39,7 @@ PAPER_SIZE_MAP = {
     "A3": Size(29700,42000),
     "LETTER": Size(21590,27940),
     "LEGAL": Size(21590,35560),
-    "TABLOID": Size(27900,43200),
+    "TABLOID": Size(27900,43200)
 }
 
 '''
