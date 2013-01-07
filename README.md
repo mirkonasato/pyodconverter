@@ -32,8 +32,8 @@ or on Linux
 
 ### Possible options are the following:
 
-* **Page Size** - Set the page orientation `-o LANDSCAPE` or `--page-orientation LANDSCAPE` (defaults to PORTRAIT)
-* **Page Orientation** - Set the page size `-s A3` or `--page-size A3` (defaults to A4)
+* **Page Orientation** - Set the page orientation `-o LANDSCAPE` or `--page-orientation LANDSCAPE` (defaults to PORTRAIT)
+* **Page Size** - Set the page size `-s A3` or `--page-size A3` (defaults to A4)
 
 If you want to write your own scripts in Python, PyODConverter can also act as
 a Python module, exporting a DocumentConverter class with a very simple API.
