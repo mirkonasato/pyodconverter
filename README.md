@@ -40,6 +40,11 @@ a Python module, exporting a DocumentConverter class with a very simple API.
 
 ## ChangeLog
 ---------
+v1.5 - 2013-01-07
+* Adding method to be able to get file base name
+* Improvement files export from Presentation to Images. Now for each
+  slide, an image will be created.
+
 v1.4 - 2013-01-03
 
 * Improvement the toProperties method to be able add array Uno properties

@@ -1,5 +1,5 @@
 #
-# PyODConverter (Python OpenDocument Converter) v1.4 - 2013-01-02
+# PyODConverter (Python OpenDocument Converter) v1.5 - 2013-01-07
 #
 # This script converts a document from one office format to another by
 # connecting to an OpenOffice.org instance via Python-UNO bridge.
@@ -245,6 +245,13 @@ PAGE_STYLE_OVERRIDE_PROPERTIES = {
     }
 }
 
+IMAGES_MEDIA_TYPE = {
+    "png": "image/png",
+    "jpeg": "image/jpeg",
+    "jpg": "image/jpeg",
+    "gif": "image/gif"
+}
+
 #-------------------#
 # Configuration End #
 #-------------------#
@@ -285,7 +292,10 @@ class DocumentConverter:
         outputUrl = self._toFileUrl(outputFile)
 
         loadProperties = { "Hidden": True }
+        
         inputExt = self._getFileExt(inputFile)
+        outputExt = self._getFileExt(outputFile);
+        
         if IMPORT_FILTER_MAP.has_key(inputExt):
             loadProperties.update(IMPORT_FILTER_MAP[inputExt])
         
@@ -296,6 +306,36 @@ class DocumentConverter:
             pass
 
         family = self._detectFamily(document)
+        
+        '''
+        If the document is a presentation file and you wish convert it to a image,
+        each slide needs be converted to a individual image.
+        '''
+        if family is 'Presentation' and IMAGES_MEDIA_TYPE.has_key(outputExt):
+            
+            drawPages = document.getDrawPages()
+            pagesTotal = drawPages.getCount()
+            mediaType = IMAGES_MEDIA_TYPE[outputExt]
+            fileBasename = self._getFileBasename(outputUrl)
+            graphicExport = self.context.ServiceManager.createInstanceWithContext("com.sun.star.drawing.GraphicExportFilter", self.context)
+            
+            for pageIndex in xrange(pagesTotal):
+                
+                page = drawPages.getByIndex(pageIndex)
+                fileName = "%s-%d.%s" % (self._getFileBasename(outputUrl), pageIndex, outputExt)
+                
+                graphicExport.setSourceDocument( page )
+                
+                props = {
+                    "MediaType": mediaType,
+                    "URL": fileName
+                }
+                
+                graphicExport.filter( self._toProperties( props ) )
+            
+            document.close(True)
+            exit(0)
+        
         self._overridePageStyleProperties(document, family)
         
         outputExt = self._getFileExt(outputFile)
@@ -353,7 +393,12 @@ class DocumentConverter:
         ext = splitext(path)[1]
         if ext is not None:
             return ext[1:].lower()
-
+    
+    def _getFileBasename(self, path):
+        name = splitext(path)[0]
+        if name is not None:
+            return name    
+    
     def _toFileUrl(self, path):
         return uno.systemPathToFileUrl(abspath(path))
 
@@ -376,7 +421,7 @@ if __name__ == "__main__":
     from sys import exit
     from optparse import OptionParser
     
-    parser = OptionParser(usage="usage: python %prog [options] <input-file> <output-file>", version="%prog 1.4")
+    parser = OptionParser(usage="usage: python %prog [options] <input-file> <output-file>", version="%prog 1.5")
     parser.add_option("-s", "--paper-size", default="A4", action="store", type="string", dest="paper_size", help="defines the paper size to converter that can be A3, A4, A5.")
     parser.add_option("-o", "--paper-orientation", default="PORTRAIT", action="store", type="string", dest="paper_orientation", help="defines the paper orientation to converter that can be PORTRAIT or LANDSCAPE.")
     
