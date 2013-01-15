@@ -341,7 +341,6 @@ class DocumentConverter:
         
         self._overridePageStyleProperties(document, family)
         
-        outputExt = self._getFileExt(outputFile)
         storeProperties = self._getStoreProperties(document, outputExt)
         
         printConfigs = {
