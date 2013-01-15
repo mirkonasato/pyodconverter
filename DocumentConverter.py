@@ -310,48 +310,46 @@ class DocumentConverter:
 
         family = self._detectFamily(document)
         
-        '''
-        If the document is a presentation file and you wish convert it to a image,
-        each slide needs be converted to a individual image.
-        '''
-        if family is 'Presentation' and IMAGES_MEDIA_TYPE.has_key(outputExt):
+        try:
+            '''
+            If you wish convert a document to an image, so each page needs be converted to a individual image.
+            '''
+            if IMAGES_MEDIA_TYPE.has_key(outputExt):
+                
+                drawPages = document.getDrawPages()
+                pagesTotal = drawPages.getCount()
+                mediaType = IMAGES_MEDIA_TYPE[outputExt]
+                fileBasename = self._getFileBasename(outputUrl)
+                graphicExport = self.context.ServiceManager.createInstanceWithContext("com.sun.star.drawing.GraphicExportFilter", self.context)
+                
+                for pageIndex in xrange(pagesTotal):
+                    
+                    page = drawPages.getByIndex(pageIndex)
+                    fileName = "%s-%d.%s" % (self._getFileBasename(outputUrl), pageIndex, outputExt)
+                    
+                    graphicExport.setSourceDocument( page )
+                    
+                    props = {
+                        "MediaType": mediaType,
+                        "URL": fileName
+                    }
+                    
+                    graphicExport.filter( self._toProperties( props ) )
+            else:
+                
+                self._overridePageStyleProperties(document, family)
             
-            drawPages = document.getDrawPages()
-            pagesTotal = drawPages.getCount()
-            mediaType = IMAGES_MEDIA_TYPE[outputExt]
-            fileBasename = self._getFileBasename(outputUrl)
-            graphicExport = self.context.ServiceManager.createInstanceWithContext("com.sun.star.drawing.GraphicExportFilter", self.context)
-            
-            for pageIndex in xrange(pagesTotal):
+                storeProperties = self._getStoreProperties(document, outputExt)
                 
-                page = drawPages.getByIndex(pageIndex)
-                fileName = "%s-%d.%s" % (self._getFileBasename(outputUrl), pageIndex, outputExt)
-                
-                graphicExport.setSourceDocument( page )
-                
-                props = {
-                    "MediaType": mediaType,
-                    "URL": fileName
+                printConfigs = {
+                    'Size': paperSize,
+                    'PaperFormat': USER,
+                    'PaperOrientation': paperOrientation
                 }
                 
-                graphicExport.filter( self._toProperties( props ) )
+                document.setPrinter( self._toProperties( printConfigs ) )
             
-            document.close(True)
-            exit(0)
-        
-        self._overridePageStyleProperties(document, family)
-        
-        storeProperties = self._getStoreProperties(document, outputExt)
-        
-        printConfigs = {
-            'Size': paperSize,
-            'PaperFormat': USER,
-            'PaperOrientation': paperOrientation
-        }
-        document.setPrinter( self._toProperties( printConfigs ) )
-        
-        try:
-            document.storeToURL(outputUrl, self._toProperties(storeProperties))
+                document.storeToURL(outputUrl, self._toProperties(storeProperties))
         finally:
             document.close(True)
 
