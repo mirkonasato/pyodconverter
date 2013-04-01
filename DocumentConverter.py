@@ -42,23 +42,23 @@ IMPORT_FILTER_MAP = {
 
 EXPORT_FILTER_MAP = {
     "pdf": {
-        FAMILY_TEXT: { "FilterName": "writer_pdf_Export" },
-        FAMILY_WEB: { "FilterName": "writer_web_pdf_Export" },
-        FAMILY_SPREADSHEET: { "FilterName": "calc_pdf_Export" },
-        FAMILY_PRESENTATION: { "FilterName": "impress_pdf_Export" },
-        FAMILY_DRAWING: { "FilterName": "draw_pdf_Export" }
+        FAMILY_TEXT: {"FilterName": "writer_pdf_Export"},
+        FAMILY_WEB: {"FilterName": "writer_web_pdf_Export"},
+        FAMILY_SPREADSHEET: {"FilterName": "calc_pdf_Export"},
+        FAMILY_PRESENTATION: {"FilterName": "impress_pdf_Export"},
+        FAMILY_DRAWING: {"FilterName": "draw_pdf_Export"}
     },
     "html": {
-        FAMILY_TEXT: { "FilterName": "HTML (StarWriter)" },
-        FAMILY_SPREADSHEET: { "FilterName": "HTML (StarCalc)" },
-        FAMILY_PRESENTATION: { "FilterName": "impress_html_Export" }
+        FAMILY_TEXT: {"FilterName": "HTML (StarWriter)"},
+        FAMILY_SPREADSHEET: {"FilterName": "HTML (StarCalc)"},
+        FAMILY_PRESENTATION: {"FilterName": "impress_html_Export"}
     },
     "odt": {
-        FAMILY_TEXT: { "FilterName": "writer8" },
-        FAMILY_WEB: { "FilterName": "writerweb8_writer" }
+        FAMILY_TEXT: {"FilterName": "writer8"},
+        FAMILY_WEB: {"FilterName": "writerweb8_writer"}
     },
     "doc": {
-        FAMILY_TEXT: { "FilterName": "MS Word 97" }
+        FAMILY_TEXT: {"FilterName": "MS Word 97"}
     },
     "rtf": {
         FAMILY_TEXT: { "FilterName": "Rich Text Format" }
@@ -120,14 +120,13 @@ class DocumentConversionException(Exception):
 
 
 class DocumentConverter:
-    
     def __init__(self, port=DEFAULT_OPENOFFICE_PORT):
         localContext = uno.getComponentContext()
         resolver = localContext.ServiceManager.createInstanceWithContext("com.sun.star.bridge.UnoUrlResolver", localContext)
         try:
             context = resolver.resolve("uno:socket,host=localhost,port=%s;urp;StarOffice.ComponentContext" % port)
         except NoConnectException:
-            raise DocumentConversionException, "failed to connect to OpenOffice.org on port %s" % port
+            raise DocumentConversionException("failed to connect to OpenOffice.org on port %s" % port)
         self.desktop = context.ServiceManager.createInstanceWithContext("com.sun.star.frame.Desktop", context)
 
     def convert(self, inputFile, outputFile):
@@ -135,11 +134,10 @@ class DocumentConverter:
         inputUrl = self._toFileUrl(inputFile)
         outputUrl = self._toFileUrl(outputFile)
 
-        loadProperties = { "Hidden": True }
+        loadProperties = {"Hidden": True}
         inputExt = self._getFileExt(inputFile)
-        if IMPORT_FILTER_MAP.has_key(inputExt):
+        if inputExt in IMPORT_FILTER_MAP:
             loadProperties.update(IMPORT_FILTER_MAP[inputExt])
-        
         document = self.desktop.loadComponentFromURL(inputUrl, "_blank", 0, self._toProperties(loadProperties))
         try:
             document.refresh()
@@ -148,7 +146,7 @@ class DocumentConverter:
 
         family = self._detectFamily(document)
         self._overridePageStyleProperties(document, family)
-        
+
         outputExt = self._getFileExt(outputFile)
         storeProperties = self._getStoreProperties(document, outputExt)
 
@@ -158,7 +156,7 @@ class DocumentConverter:
             document.close(True)
 
     def _overridePageStyleProperties(self, document, family):
-        if PAGE_STYLE_OVERRIDE_PROPERTIES.has_key(family):
+        if family in PAGE_STYLE_OVERRIDE_PROPERTIES:
             properties = PAGE_STYLE_OVERRIDE_PROPERTIES[family]
             pageStyles = document.getStyleFamilies().getByName('PageStyles')
             for styleName in pageStyles.getElementNames():
@@ -171,12 +169,11 @@ class DocumentConverter:
         try:
             propertiesByFamily = EXPORT_FILTER_MAP[outputExt]
         except KeyError:
-            raise DocumentConversionException, "unknown output format: '%s'" % outputExt
+            raise DocumentConversionException("unknown output format: '%s'" % outputExt)
         try:
             return propertiesByFamily[family]
         except KeyError:
-            raise DocumentConversionException, "unsupported conversion: from '%s' to '%s'" % (family, outputExt)
-    
+            raise DocumentConversionException("unsupported conversion: from '%s' to '%s'" % (family, outputExt))
     def _detectFamily(self, document):
         if document.supportsService("com.sun.star.text.WebDocument"):
             return FAMILY_WEB
@@ -189,7 +186,7 @@ class DocumentConverter:
             return FAMILY_PRESENTATION
         if document.supportsService("com.sun.star.drawing.DrawingDocument"):
             return FAMILY_DRAWING
-        raise DocumentConversionException, "unknown document family: %s" % document
+        raise DocumentConversionException("unknown document family: %s" % document)
 
     def _getFileExt(self, path):
         ext = splitext(path)[1]
@@ -213,19 +210,18 @@ if __name__ == "__main__":
     from sys import argv, exit
     
     if len(argv) < 3:
-        print "USAGE: python %s <input-file> <output-file>" % argv[0]
+        print ("USAGE: python %s <input-file> <output-file>" % argv[0])
         exit(255)
     if not isfile(argv[1]):
-        print "no such input file: %s" % argv[1]
+        print ("no such input file: %s" % argv[1])
         exit(1)
 
     try:
-        converter = DocumentConverter()    
+        converter = DocumentConverter()
         converter.convert(argv[1], argv[2])
-    except DocumentConversionException, exception:
-        print "ERROR! " + str(exception)
+    except DocumentConversionException as exception:
+        print ("ERROR! " + str(exception))
         exit(1)
-    except ErrorCodeIOException, exception:
-        print "ERROR! ErrorCodeIOException %d" % exception.ErrCode
+    except ErrorCodeIOException as exception:
+        print ("ERROR! ErrorCodeIOException %d" % exception.ErrCode)
         exit(1)
-
