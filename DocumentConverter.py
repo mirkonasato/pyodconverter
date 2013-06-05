@@ -344,6 +344,7 @@ class DocumentConverter:
                 storeProperties = self._getStoreProperties(document, outputExt)
                 
                 printConfigs = {
+                    'AllSheets': True,
                     'Size': paperSize,
                     'PaperFormat': USER,
                     'PaperOrientation': paperOrientation
