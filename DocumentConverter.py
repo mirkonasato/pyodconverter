@@ -2,7 +2,7 @@
 # PyODConverter (Python OpenDocument Converter) v1.2 - 2012-03-10
 #
 # This script converts a document from one office format to another by
-# connecting to an OpenOffice.org instance via Python-UNO bridge.
+# connecting to an LibreOffice instance via Python-UNO bridge.
 #
 # Copyright (C) 2008-2012 Mirko Nasato
 # Licensed under the GNU LGPL v2.1 - http://www.gnu.org/licenses/lgpl-2.1.html
@@ -127,7 +127,7 @@ class DocumentConverter:
         try:
             context = resolver.resolve("uno:socket,host=localhost,port=%s;urp;StarOffice.ComponentContext" % port)
         except NoConnectException:
-            raise DocumentConversionException, "failed to connect to OpenOffice.org on port %s" % port
+            raise DocumentConversionException("failed to connect to LibreOffice on port %s" % port)
         self.desktop = context.ServiceManager.createInstanceWithContext("com.sun.star.frame.Desktop", context)
 
     def convert(self, inputFile, outputFile):
@@ -137,7 +137,7 @@ class DocumentConverter:
 
         loadProperties = { "Hidden": True }
         inputExt = self._getFileExt(inputFile)
-        if IMPORT_FILTER_MAP.has_key(inputExt):
+        if inputExt in IMPORT_FILTER_MAP:
             loadProperties.update(IMPORT_FILTER_MAP[inputExt])
         
         document = self.desktop.loadComponentFromURL(inputUrl, "_blank", 0, self._toProperties(loadProperties))
@@ -158,12 +158,12 @@ class DocumentConverter:
             document.close(True)
 
     def _overridePageStyleProperties(self, document, family):
-        if PAGE_STYLE_OVERRIDE_PROPERTIES.has_key(family):
+        if family in PAGE_STYLE_OVERRIDE_PROPERTIES:
             properties = PAGE_STYLE_OVERRIDE_PROPERTIES[family]
             pageStyles = document.getStyleFamilies().getByName('PageStyles')
             for styleName in pageStyles.getElementNames():
                 pageStyle = pageStyles.getByName(styleName)
-                for name, value in properties.items():
+                for name, value in list(properties.items()):
                     pageStyle.setPropertyValue(name, value)
 
     def _getStoreProperties(self, document, outputExt):
@@ -171,11 +171,11 @@ class DocumentConverter:
         try:
             propertiesByFamily = EXPORT_FILTER_MAP[outputExt]
         except KeyError:
-            raise DocumentConversionException, "unknown output format: '%s'" % outputExt
+            raise DocumentConversionException("unknown output format: '%s'" % outputExt)
         try:
             return propertiesByFamily[family]
         except KeyError:
-            raise DocumentConversionException, "unsupported conversion: from '%s' to '%s'" % (family, outputExt)
+            raise DocumentConversionException("unsupported conversion: from '%s' to '%s'" % (family, outputExt))
     
     def _detectFamily(self, document):
         if document.supportsService("com.sun.star.text.WebDocument"):
@@ -189,7 +189,7 @@ class DocumentConverter:
             return FAMILY_PRESENTATION
         if document.supportsService("com.sun.star.drawing.DrawingDocument"):
             return FAMILY_DRAWING
-        raise DocumentConversionException, "unknown document family: %s" % document
+        raise DocumentConversionException("unknown document family: %s" % document)
 
     def _getFileExt(self, path):
         ext = splitext(path)[1]
@@ -213,19 +213,19 @@ if __name__ == "__main__":
     from sys import argv, exit
     
     if len(argv) < 3:
-        print "USAGE: python %s <input-file> <output-file>" % argv[0]
+        print("USAGE: python %s <input-file> <output-file>" % argv[0])
         exit(255)
     if not isfile(argv[1]):
-        print "no such input file: %s" % argv[1]
+        print("no such input file: %s" % argv[1])
         exit(1)
 
     try:
         converter = DocumentConverter()    
         converter.convert(argv[1], argv[2])
-    except DocumentConversionException, exception:
-        print "ERROR! " + str(exception)
+    except DocumentConversionException as exception:
+        print("ERROR! " + str(exception))
         exit(1)
-    except ErrorCodeIOException, exception:
-        print "ERROR! ErrorCodeIOException %d" % exception.ErrCode
+    except ErrorCodeIOException as exception:
+        print("ERROR! ErrorCodeIOException %d" % exception.ErrCode)
         exit(1)
 
