@@ -15,7 +15,7 @@ PyODConverter requires LibreOffice/Apache OpenOffice to be running as a service
 and listening on port (by default) 2002; this can be achieved e.g. by starting
 it from the command line as
 
-    $ soffice "-accept=socket,port=2002;urp;"
+    $ soffice "--accept=socket,port=2002;urp;"
 
 The script expects exactly 2 parameters: an input and an output file names.
 The document formats are inferred from the file extensions.
@@ -36,7 +36,7 @@ a Python module, exporting a DocumentConverter class with a very simple API.
 ChangeLog
 ---------
 
-V1.3 - 2021-03-21
+v2.0 - 2021-03-27
 
 * Converted to Python 3 using 2to3 Python2 to Python3 converter script
 

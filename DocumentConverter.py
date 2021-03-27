@@ -1,8 +1,8 @@
 #
-# PyODConverter (Python OpenDocument Converter) v1.2 - 2012-03-10
+# PyODConverter (Python OpenDocument Converter) v2.0 - 2021-03-27
 #
 # This script converts a document from one office format to another by
-# connecting to an LibreOffice instance via Python-UNO bridge.
+# connecting to a LibreOffice instance via Python-UNO bridge.
 #
 # Copyright (C) 2008-2012 Mirko Nasato
 # Licensed under the GNU LGPL v2.1 - http://www.gnu.org/licenses/lgpl-2.1.html
