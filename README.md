@@ -3,7 +3,7 @@ PyODConverter
 
 PyODConverter (for Python OpenDocument Converter) is a Python script that
 automates office document conversions from the command line using
-LibreOffice or OpenOffice.org.
+LibreOffice or Apache OpenOffice.
 
 The script was written as a simpler alternative to
 [JODConverter](http://code.google.com/p/jodconverter/) for command line usage.
@@ -11,7 +11,7 @@ The script was written as a simpler alternative to
 Usage
 -----
 
-PyODConverter requires LibreOffice/OpenOffice.org to be running as a service
+PyODConverter requires LibreOffice/Apache OpenOffice to be running as a service
 and listening on port (by default) 2002; this can be achieved e.g. by starting
 it from the command line as
 
@@ -22,19 +22,23 @@ The document formats are inferred from the file extensions.
 
 Since it uses the Python/UNO bridge, the script requires the UNO modules to be
 already present in your Python installation. Most of the time this means you
-need to use the Python version installed with OpenOffice.org, e.g. on Windows
+need to use the Python version installed with LibreOffice, e.g. on Windows
 
-    > "C:\Program Files\OpenOffice.org 3.1\program\python" DocumentConverter.py test.odt test.pdf
+    > "C:\Program Files\LibreOffice\program\python" DocumentConverter.py test.odt test.pdf
 
 or on Linux
 
-    $ /opt/openoffice.org3.1/program/python DocumentConverter.py test.odt test.pdf
+    $ /opt/libreoffice7.1/program/python DocumentConverter.py test.odt test.pdf
 
 If you want to write your own scripts in Python, PyODConverter can also act as
 a Python module, exporting a DocumentConverter class with a very simple API.
 
 ChangeLog
 ---------
+
+V1.3 - 2021-03-21
+
+* Converted to Python 3 using 2to3 Python2 to Python3 converter script
 
 v1.2 - 2012-03-10
 
